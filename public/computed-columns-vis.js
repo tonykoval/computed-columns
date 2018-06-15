@@ -1,29 +1,27 @@
 import 'plugins/computed-columns/computed-columns.less';
 import 'plugins/computed-columns/computed-columns-vis-controller';
 import 'plugins/computed-columns/computed-columns-params';
-import mainTemplate from 'plugins/computed-columns/computed-columns-vis.html';
-import optionsTemplate from 'plugins/computed-columns/computed-columns-params.html';
+import computedTableVisTemplate from 'plugins/computed-columns/computed-columns-vis.html';
 
+import 'ui/agg_table';
+import 'ui/agg_table/agg_table_group';
 import {CATEGORY} from 'ui/vis/vis_category';
+import { Schemas } from 'ui/vis/editors/default/schemas';
 import {VisFactoryProvider} from 'ui/vis/vis_factory';
 import {VisTypesRegistryProvider} from 'ui/registry/vis_types';
-import {VisSchemasProvider} from 'ui/vis/editors/default/schemas';
 
-import image from './images/icon-table.svg';
+VisTypesRegistryProvider.register(ComputedTableVisTypeProvider);
 
-VisTypesRegistryProvider.register(ExtendedMetricVisProvider);
-
-function ExtendedMetricVisProvider(Private) {
+function ComputedTableVisTypeProvider(Private) {
   const VisFactory = Private(VisFactoryProvider);
-  const Schemas = Private(VisSchemasProvider);
 
   return VisFactory.createAngularVisualization({
+    type: 'table',
     name: 'computed-columns',
     title: 'Computed Cols',
     icon: 'fa-table',
     description: 'Same functionality than Data Table, but after data processing, computed columns can be added with math expressions.',
     category: CATEGORY.DATA,
-    responseHandler: 'none',
     visConfig: {
       defaults: {
         perPage: 10,
@@ -43,26 +41,42 @@ function ExtendedMetricVisProvider(Private) {
         }],
         hideExportLinks: false
       },
-      template: mainTemplate,
+      template: computedTableVisTemplate,
     },
     editorConfig: {
-      optionsTemplate: optionsTemplate,
-      schemas: new Schemas([{
+      optionsTemplate: '<computed-table-vis-params></computed-table-vis-params>',
+      schemas: new Schemas([
+      {
         group: 'metrics',
         name: 'metric',
         title: 'Metric',
+        aggFilter: ['!geo_centroid', '!geo_bounds'],
         min: 1,
-      }, {
+        defaults: [
+          { type: 'count', schema: 'metric' }
+        ]
+      },
+      {
         group: 'buckets',
         name: 'bucket',
-        title: 'Split Rows'
-      }, {
+        title: 'Split Rows',
+        aggFilter: ['!filter']
+      },
+      {
         group: 'buckets',
         name: 'split',
-        title: 'Split Table'
-      }]),
+        title: 'Split Table',
+        aggFilter: ['!filter']
+      }
+    ])
+    },
+    responseHandlerConfig: {
+      asAggConfigResults: true
+    },
+    hierarchicalData: function (vis) {
+      return Boolean(vis.params.showPartialRows || vis.params.showMeticsAtAllLevels);
     }
   });
 }
 
-export default ExtendedMetricVisProvider;
+export default ComputedTableVisTypeProvider;

@@ -32,28 +32,33 @@ From 0.5.x every release includes plugins version (x.y.z) and Kibana version (a.
 * Numeric data validation.
 * Hidden columns format validation.
 
-## development
+## Development
+See the [kibana contributing guide](https://github.com/elastic/kibana/blob/master/CONTRIBUTING.md) for instructions setting up your development environment. Once you have completed that, use the following yarn scripts.
 
-See the [kibana contributing guide](https://github.com/elastic/kibana/blob/master/CONTRIBUTING.md) for instructions setting up your development environment. Once you have completed that, use the following npm tasks.
+  - `yarn kbn bootstrap`
 
-  - `npm start`
+    Install dependencies and crosslink Kibana and all projects/plugins.
 
-    Start kibana and have it include this plugin
+    > ***IMPORTANT:*** Use this script instead of `yarn` to install dependencies when switching branches, and re-run it whenever your dependencies change.
 
-  - `npm start -- --config kibana.yml`
+  - `yarn start`
 
-    You can pass any argument that you would normally send to `bin/kibana` by putting them after `--` when running `npm start`
+    Start kibana and have it include this plugin. You can pass any arguments that you would normally send to `bin/kibana`
 
-  - `npm run build`
+      ```
+      yarn start --elasticsearch.url http://localhost:9220
+      ```
 
-    Build a distributable archive
+  - `yarn build`
 
-  - `npm run test:browser`
+    Build a distributable archive of your plugin.
 
-    Run the browser tests in a real web browser
+  - `yarn test:browser`
 
-  - `npm run test:server`
+    Run the browser tests in a real web browser.
 
-    Run the server tests using mocha
+  - `yarn test:server`
 
-For more information about any of these commands run `npm run ${task} -- --help`.
+    Run the server tests using mocha.
+
+For more information about any of these commands run `yarn ${task} --help`. For a full list of tasks checkout the `package.json` file, or run `yarn run`.

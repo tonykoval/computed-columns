@@ -1,4 +1,4 @@
-<div class="computed-columns-options-container" ng-controller="ComputedColumnsParamsVisController" style="width: 100%;">
+<div class="computed-columns-options-container kuiSideBarSection" style="width: 100%;">
     <div draggable-container="$parent.vis.params.computedColumns"
           style="width: 100%;">
         <div ng-repeat="output in $parent.vis.params.computedColumns"
@@ -30,7 +30,7 @@
                         aria-label="{{output.enabled ? 'Disable' : 'Enable'}} Output"
                         tooltip="{{output.enabled ? 'Disable' : 'Enable'}} Output"
                         tooltip-append-to-body="true"
-                        type="button" class="btn btn-xs">
+                        type="button" class="kuiButton kuiButton--basic kuiButton--small">
                       <i aria-hidden="true"
                          class="fa"
                          ng-class="{'fa-toggle-off': !output.enabled, 'fa-toggle-on': output.enabled}"></i>
@@ -41,7 +41,7 @@
                         tooltip="Modify Priority by Dragging"
                         tooltip-append-to-body="true"
                         type="button"
-                        class="btn btn-xs gu-handle">
+                        class="kuiButton kuiButton--basic kuiButton--small">
                       <i aria-hidden="true" class="fa fa-arrows-v"></i>
                     </button>
 
@@ -49,7 +49,7 @@
                         aria-label="Remove Output" ng-click="removeComputedColumn(output, $parent.vis.params.computedColumns)"
                         tooltip="Remove Output"
                         tooltip-append-to-body="true"
-                        type="button" class="btn btn-xs btn-danger">
+                        type="button" class="kuiButton kuiButton--danger kuiButton--small">
                       <i aria-hidden="true" class="fa fa-times"></i>
                     </button>
                 </div>
@@ -87,8 +87,8 @@
     </div>
 
     <div class="form-group">
-      <label>Per Page</label>
-      <input type="number" ng-model="vis.params.perPage" class="form-control">
+      <label for="datatableVisualizationPerPage">Per Page</label>
+      <input type="number" ng-model="vis.params.perPage" class="form-control" id="datatableVisualizationPerPage">
     </div>
 
     <div class="checkbox">
@@ -127,11 +127,11 @@
     </div>
 
     <div>
-      <label>Total function</label>
+      <label for="datatableVisualizationTotalFunction">Total function</label>
       <select ng-disabled="!vis.params.showTotal"
-              class="form-control"
-              ng-model="vis.params.totalFunc"
-              ng-options="x for x in totalAggregations">
+                class="form-control"
+                ng-model="vis.params.totalFunc"
+                ng-options="x for x in totalAggregations" id="datatableVisualizationTotalFunction">
       </select>
     </div>
 

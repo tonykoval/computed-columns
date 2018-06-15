@@ -1,23 +1,20 @@
-import _ from 'lodash';
+import { assign } from 'lodash';
 import { Parser } from 'expr-eval';
 import numeral from 'numeral';
 
-import { VisAggConfigProvider } from 'ui/vis/agg_config';
+import { AggConfig } from 'ui/vis/agg_config';
 import AggConfigResult from 'ui/vis/agg_config_result';
-import { AggResponseTabifyProvider } from 'ui/agg_response/tabify/tabify';
 import { uiModules } from 'ui/modules';
 
 const module = uiModules.get('kibana/computed-columns', ['kibana']);
 
 module.controller('ComputedColumnsVisController', ($scope, $element, Private) => {
 
-  const tabifyAggResponse = Private(AggResponseTabifyProvider);
-  const AggConfig = Private(VisAggConfigProvider);
   const uiStateSort = ($scope.uiState) ? $scope.uiState.get('vis.params.sort') : {};
-  _.assign($scope.vis.params.sort, uiStateSort);
+  assign($scope.vis.params.sort, uiStateSort);
 
   $scope.sort = $scope.vis.params.sort;
-  $scope.$watchCollection('sort', (newSort) => {
+  $scope.$watchCollection('sort', function (newSort) {
     $scope.uiState.set('vis.params.sort', newSort);
   });
 
@@ -56,7 +53,7 @@ module.controller('ComputedColumnsVisController', ($scope, $element, Private) =>
       let newCell = new AggConfigResult(column.aggConfig, void 0, value, value);
 
       newCell.toString = () => {
-        return (typeof value === 'number') ? numeral(value).format(computedColumn.format) : value;
+        return (typeof value === 'number' && !isNaN(value)) ? numeral(value).format(computedColumn.format) : value;
       };
       row.push(newCell);
       return row;
@@ -110,21 +107,18 @@ module.controller('ComputedColumnsVisController', ($scope, $element, Private) =>
     $scope.uiState.set('vis.params.sort', newSort);
   });
 
-  $scope.$watchMulti(['esResponse', 'vis.params'], ([resp]) => {
+  $scope.$watch('renderComplete', function () {
+
     let tableGroups = $scope.tableGroups = null;
     let hasSomeRows = $scope.hasSomeRows = null;
-    let computedColumns = $scope.vis.params.computedColumns;
+    let computedColumns = $scope.vis.params.computedColumns.filter(output => output.enabled);
     let hiddenColumns = $scope.vis.params.hiddenColumns;
 
-    if (resp) {
-      const vis = $scope.vis;
-      const params = vis.params;
+    const vis = $scope.vis;
+    const params = vis.params;
 
-      tableGroups = tabifyAggResponse(vis, resp, {
-        partialRows: params.showPartialRows,
-        minimalColumns: vis.isHierarchical() && !params.showMeticsAtAllLevels,
-        asAggConfigResults: true
-      });
+    if ($scope.esResponse) {
+      tableGroups = $scope.esResponse;
 
       _.forEach(computedColumns, (computedColumn, index) => {
         createTables(tableGroups.tables, computedColumn, index);
@@ -141,14 +135,14 @@ module.controller('ComputedColumnsVisController', ($scope, $element, Private) =>
         'hide-pagination': !shouldShowPagination,
         'hide-export-links': params.hideExportLinks
       };
-
-      $scope.renderComplete();
     }
 
     $scope.hasSomeRows = hasSomeRows;
     if (hasSomeRows) {
       $scope.tableGroups = tableGroups;
     }
+
+    $scope.renderComplete();
   });
 
 });
